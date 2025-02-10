@@ -15,20 +15,13 @@ export class PersonService {
     workUse: boolean;
     isAdmin: boolean;
   }) {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.person.create({
       data: {
         ...data,
         password: hashedPassword,
       },
     });
-  }
-  async validatePassword(
-    plainPassword: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    return bcrypt.compare(plainPassword, hashedPassword);
   }
   async findAll() {
     return this.prisma.person.findMany();

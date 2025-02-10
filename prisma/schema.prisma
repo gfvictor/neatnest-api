@@ -9,22 +9,23 @@ datasource db {
 }
 
 model Person {
-  id          String     @id @default(uuid())
-  name        String
-  username    String     @unique
-  email       String     @unique
-  password    String
-  avatar      String?
-  homeUse     Boolean    @default(true)
-  workUse     Boolean    @default(false)
-  isAdmin     Boolean    @default(false)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @default(now())
-  deletedAt   DateTime?
-  household   Household? @relation(fields: [householdId], references: [id])
-  householdId String?
-  workplace   Workplace? @relation(fields: [workplaceId], references: [id])
-  workplaceId String?
+  id           String     @id @default(uuid())
+  name         String
+  username     String     @unique
+  email        String     @unique
+  password     String
+  avatar       String?
+  homeUse      Boolean    @default(true)
+  workUse      Boolean    @default(false)
+  isAdmin      Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now())
+  deletedAt    DateTime?
+  householdId  String?
+  workplaceId  String?
+  refreshToken String?
+  household    Household? @relation(fields: [householdId], references: [id])
+  workplace    Workplace? @relation(fields: [workplaceId], references: [id])
 }
 
 model Household {
@@ -39,12 +40,12 @@ model Household {
 model Room {
   id          String      @id @default(uuid())
   name        String
+  householdId String
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now())
   deletedAt   DateTime?
   containers  Container[]
   household   Household   @relation(fields: [householdId], references: [id])
-  householdId String
 }
 
 model Workplace {
@@ -59,12 +60,12 @@ model Workplace {
 model Section {
   id          String      @id @default(uuid())
   name        String
+  workplaceId String
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @default(now())
   deletedAt   DateTime
   containers  Container[]
   workplace   Workplace   @relation(fields: [workplaceId], references: [id])
-  workplaceId String
 }
 
 model Container {
@@ -72,13 +73,13 @@ model Container {
   name      String
   number    Int
   image     String?
+  roomId    String?
+  sectionId String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @default(now())
   deletedAt DateTime?
   room      Room?     @relation(fields: [roomId], references: [id])
-  roomId    String?
   section   Section?  @relation(fields: [sectionId], references: [id])
-  sectionId String?
   objects   Object[]
 }
 
@@ -91,6 +92,6 @@ model Object {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now())
   deletedAt   DateTime?
-  container   Container @relation(fields: [containerId], references: [id])
   containerId String
+  container   Container @relation(fields: [containerId], references: [id])
 }

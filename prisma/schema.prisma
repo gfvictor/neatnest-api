@@ -19,19 +19,31 @@ model Person {
   workUse      Boolean    @default(false)
   isAdmin      Boolean    @default(false)
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
   householdId  String?
   workplaceId  String?
   refreshToken String?
   household    Household? @relation(fields: [householdId], references: [id])
   workplace    Workplace? @relation(fields: [workplaceId], references: [id])
+  sessions     Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         Person   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String
+  device       String
+  ip           String?
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
 }
 
 model Household {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   persons   Person[]
   rooms     Room[]
@@ -42,7 +54,7 @@ model Room {
   name        String
   householdId String
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   deletedAt   DateTime?
   containers  Container[]
   household   Household   @relation(fields: [householdId], references: [id])
@@ -51,7 +63,7 @@ model Room {
 model Workplace {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   persons   Person[]
   sections  Section[]
@@ -62,7 +74,7 @@ model Section {
   name        String
   workplaceId String
   createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   deletedAt   DateTime
   containers  Container[]
   workplace   Workplace   @relation(fields: [workplaceId], references: [id])
@@ -76,7 +88,7 @@ model Container {
   roomId    String?
   sectionId String?
   createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
   room      Room?     @relation(fields: [roomId], references: [id])
   section   Section?  @relation(fields: [sectionId], references: [id])
@@ -90,7 +102,7 @@ model Object {
   category    String?
   image       String?
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
   containerId String
   container   Container @relation(fields: [containerId], references: [id])

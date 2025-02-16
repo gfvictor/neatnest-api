@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
+import { Request } from 'express';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -9,6 +10,52 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
+
+  private generateToken(user: { id: string; email: string; username: string }) {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      username: user.username,
+    };
+
+    return {
+      access_token: this.jwtService.sign(payload, { expiresIn: '1h' }),
+      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
+    };
+  }
+
+  private async createSession(
+    userId: string,
+    refreshToken: string,
+    req: Request,
+  ) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const device = req.headers['user-agent'] || 'Unknown Device';
+    const ip = req.ip || 'Unknown IP';
+
+    await this.prisma.session.create({
+      data: {
+        user: { connect: { id: userId } },
+        refreshToken: hashedRefreshToken,
+        device,
+        ip,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias
+      },
+    });
+  }
+
+  async getUserSessions(userId: string) {
+    return this.prisma.session.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        device: true,
+        ip: true,
+        createdAt: true,
+        expiresAt: true,
+      },
+    });
+  }
 
   async validateUser(identifier: string, password: string) {
     const user = await this.prisma.person.findFirst({
@@ -29,61 +76,72 @@ export class AuthService {
     return user;
   }
 
-  private generateToken(user: { id: string; email: string; username: string }) {
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      username: user.username,
-    };
-
-    return {
-      access_token: this.jwtService.sign(payload, { expiresIn: '1h' }),
-      refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
-    };
-  }
-
-  private async storeRefreshToken(userId: string, refreshToken: string) {
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.prisma.person.update({
-      where: { id: userId },
-      data: { refreshToken: hashedRefreshToken },
-    });
-  }
-
-  async login(identifier: string, password: string) {
+  async login(identifier: string, password: string, req: Request) {
     const user = await this.validateUser(identifier, password);
 
     const { access_token, refresh_token } = this.generateToken(user);
-    await this.storeRefreshToken(user.id, refresh_token);
+    await this.createSession(user.id, refresh_token, req);
 
     return { access_token, refresh_token };
   }
 
   async refreshToken(userId: string, refreshToken: string) {
-    const user = await this.prisma.person.findUnique({
-      where: { id: userId },
+    const session = await this.prisma.session.findFirst({
+      where: { userId, refreshToken: { not: undefined } },
+      include: { user: true },
     });
-    if (!user || !user.refreshToken) {
+    if (!session || !session.refreshToken) {
       throw new UnauthorizedException('Invalid or expired token');
     }
-    const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
+    const isValid = await bcrypt.compare(refreshToken, session.refreshToken);
     if (!isValid) {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    const { access_token, refresh_token: newRefreshToken } =
-      this.generateToken(user);
-    await this.storeRefreshToken(user.id, newRefreshToken);
+    const user = await this.prisma.person.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const { access_token, refresh_token: newRefreshToken } = this.generateToken(
+      {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
+    );
+
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: {
+        refreshToken: await bcrypt.hash(newRefreshToken, 10),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      },
+    });
 
     return { access_token, refresh_token: newRefreshToken };
   }
 
-  async logout(userId: string) {
-    await this.prisma.person.update({
-      where: { id: userId },
-      data: { refreshToken: null },
+  async logout(sessionId: string) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
     });
 
+    if (!session) {
+      throw new Error('Session no found');
+    }
+
+    await this.prisma.session.delete({ where: { id: sessionId } });
+
     return { message: 'User successfully logged out' };
+  }
+
+  async logoutAll(userId: string) {
+    await this.prisma.session.deleteMany({ where: { userId } });
+
+    return { message: 'All sessions successfully logged out' };
   }
 }

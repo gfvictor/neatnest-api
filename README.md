@@ -1,11 +1,11 @@
 ![NeatNest Logo](/assets/images/neatnest-logo-dark.svg)
 
-<div align="center">
+<div style="text-align: center">
 <i>A well-structured API for managing household and workplace objects efficiently</i>
 </div>
 
 ## Overview
-**NeatNest** is a scalable, RESTful API developed using **NestJS** and **Prisma**, designed to facilitate the efficient 
+NeatNest is a scalable, RESTful API developed using **NestJS** and **Prisma**, designed to facilitate the efficient 
 management of household and workplace inventories. This system enables users to categorize and track objects within 
 designated rooms, sections and containers. NeatNest incorporates role-based authentication and session management to 
 enhance security and accessibility.

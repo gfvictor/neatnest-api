@@ -1,99 +1,186 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+![NeatNest Logo](/assets/images/neatnest-logo-dark.svg)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<div align="center">
+<i>A well-structured API for managing household and workplace objects efficiently</i>
+</div>
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Overview
+**NeatNest** is a scalable, RESTful API developed using **NestJS** and **Prisma**, designed to facilitate the efficient 
+management of household and workplace inventories. This system enables users to categorize and track objects within 
+designated rooms, sections and containers. NeatNest incorporates role-based authentication and session management to 
+enhance security and accessibility.
+---
 
-## Description
+## Technology Stack
+- **NestJS** - Node.js framework for building efficient and scalable server-side applications.
+- **Prisma ORM** - Modern database toolkit to streamline interactions with PostgreSQL.
+- **PostgreSQL** - Relational database solution hosted via Supabase.
+- **JWT Authentication** - Implements secure access through access and refresh tokens.
+- **Class-validator** - Enables robust DTO-based request validation.
+- **Swagger** - API documentation and interactive testing.
+---
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Installation Guide
+### Prerequisites
+_Ensure that the following dependencies are installed before proceeding:_
 
-## Project setup
+- Node.js (v18+)
+- PostgreSQL database (Supabase recommended)
+- NPM or Yarn
 
+### Clone the Repository
 ```bash
-$ npm install
+git clone https://github.com/gfvictor/neatnest-api.git
+cd neatnest-api
 ```
 
-## Compile and run the project
-
+### Install Dependencies
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
-
+### Configure Environment Variables
+Create a <code>.env</code> file in the root directory and set the necessary configurations:
 ```bash
-# unit tests
-$ npm run test
+DATABASE_URL=postgresql://user:password@host:port/dbname
+DIRECT_URL=provided-by-supabase
+SUPABASE_URL=provided-by-supabase
+SUPABASE_KEY=provided-by-supabase
+JWT_SECRET_KEY=your_jwt_secret
+PORT=3000
+TZ=your-timezone
+```
+---
 
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+## Running the Application
+### Development Mode
+```bash
+npm run start:dev
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### Database Synchronization
 ```bash
-$ npm install -g mau
-$ mau deploy
+npx prisma db pull
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Database Migration
+```bash
+npx prisma migrate dev --name init
+```
 
-## Resources
+### Database Modifications
+```bash
+npx prisma generate
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Access Prisma Studio
+```bash
+npm prisma studio
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Production Mode
+```bash
+npm run build
+npm run start
+```
+---
 
-## Support
+## Database Schema
+The database follows a relational structure using **PostgreSQL**,  managed via **Prisma ORM**.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### User Table (<code>User</code>)
+| Column       | Type     | Constraints                                       |
+|--------------|----------|---------------------------------------------------|
+| id           | UUID     | Primary key, Auto-generated                       |
+| name         | String   | Not null                                          |
+| username     | String   | Unique, Not null                                  |
+| email        | String   | Unique, Not null                                  |
+| password     | String   | Not null                                          |
+| homeUse      | Boolean  | Default: true                                     |
+| workUse      | Boolean  | Default: false                                    |
+| role         | Enum     | [user, admin, tester] <br/>Default: user          |
+| createtAt    | DateTime | Auto-generated                                    |
+| updatedAt    | DateTime | Auto-updated                                      |
+| deletedAt    | DateTime | Nullable                                          |
+| refreshToken | String   | Nullable                                          |
+| householdId  | UUID     | Nullable, Foreign key (<code>Household.id</code>) |
+| workplaceId  | UUID     | Nullable, Foreign key (<code>Workplace.id</code>) |
 
-## Stay in touch
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Session Table (<code>Session</code>)
+| Column       | Type     | Constraints                        |
+|--------------|----------|------------------------------------|
+| id           | UUID     | Primary key, Auto-generated        |
+| refreshToken | String   | Hashed token                       |
+| devide       | String   | User's device information          |
+| ip           | String   | User's IP address                  |
+| createdAt    | DateTime | Auto-generated                     |
+| expiresAt    | DateTime | Expiration timestamp               |
+| userId       | UUID     | Foreign key (<code>User.id</code>) |
 
-## License
+### Household Table (<code>Household</code>)
+| Column    | Type     | Constraints                 |
+|-----------|----------|-----------------------------|
+| id        | UUID     | Primary key, Auto-generated |
+| createdAt | DateTime | Auto-generated              |
+| updatedAt | DateTime | Auto-updated                |
+| deletedAt | DateTIme | Nullable                    |
+| userId    | UUID     | Foreign key (               |
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Room Table (<code>Room</code>)
+| Column      | Type     | Constraints                             |
+|-------------|----------|-----------------------------------------|
+| id          | UUID     | Primary key, Auto-generated             |
+| name        | String   | Not null                                |
+| createdAt   | DataTime | Auto-generated                          |
+| updatedAt   | DateTime | Auto-updated                            |
+| deleteAt    | DateTime | Nullable                                |
+| householdId | UUID     | Foreign key (<code>Household.id</code>) |
+
+### Workplace Table (<code>Workplace</code>)
+| Column    | Type     | Constraints                 |
+|-----------|----------|-----------------------------|
+| id        | UUID     | Primary key, Auto-generated |
+| createdAt | DataTime | Auto-generated              |
+| updatedAt | DataTime | Auto-updated                |
+| deletedAt | DateTime | Nullable                    |
+
+### Section Table (<code>Section</code>)
+| Column      | Type     | Constraints                             |
+|-------------|----------|-----------------------------------------|
+| id          | UUID     | Primary key, Auto-generated             |
+| name        | String   | Not null                                |
+| createdAt   | DateTime | Auto-generated                          |
+| updatedAt   | DateTime | Auto-updated                            |
+| deletedAt   | DateTime | Nullable                                |
+| workplaceId | UUID     | Foreign key (<code>Workplace.id</code>) |
+
+### Container Table (<code>Container</code>)
+| Column    | Type     | Constraints                                           |
+|-----------|----------|-------------------------------------------------------|
+| id        | UUID     | Primary key, Auto-generated                           |
+| name      | String   | Not null                                              |
+| number    | Int      | Not null                                              |
+| image     | String   | Nullable                                              |
+| createdAt | DateTime | Auto-generated                                        |
+| updatedAt | DateTime | Auto-updated                                          |
+| deletedAt | DateTime | Nullable                                              |
+| roomId    | UUID     | Foreign key (<code>Room.id</code>) <br>or Nullable    |
+| sectionId | UUID     | Foreign key (<code>Section.id</code>) <br>or Nullable |
+
+### Object Table (<code>Object</code>)
+| Column      | Type     | Constraints                             |
+|-------------|----------|-----------------------------------------|
+| id          | UUID     | Primary key, Auto-generated             |
+| name        | String   | Not null                                |
+| quantity    | Int      | Not null                                |
+| category    | String   | Nullable                                |
+| image       | String   | Nullable                                |
+| createdAt   | DateTime | Auto-generated                          |
+| updatedAt   | DateTime | Auto-updated                            |
+| deleteAt    | DateTime | Nullable                                |
+| containerId | UUID     | Foreign key (<code>Container.id</code>) |
+---
+## Licence
+
+This project is licensed under the **Apache Licence 2.0**.

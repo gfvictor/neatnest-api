@@ -8,7 +8,13 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model Person {
+enum Role {
+  USER
+  ADMIN
+  TESTER
+}
+
+model User {
   id           String     @id @default(uuid())
   name         String
   username     String     @unique
@@ -17,7 +23,7 @@ model Person {
   avatar       String?
   homeUse      Boolean    @default(true)
   workUse      Boolean    @default(false)
-  isAdmin      Boolean    @default(false)
+  role         Role       @default(USER)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
@@ -32,7 +38,7 @@ model Person {
 model Session {
   id           String   @id @default(uuid())
   userId       String
-  user         Person   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   refreshToken String
   device       String
   ip           String?
@@ -45,7 +51,7 @@ model Household {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  persons   Person[]
+  users     User[]
   rooms     Room[]
 }
 
@@ -65,7 +71,7 @@ model Workplace {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  persons   Person[]
+  users     User[]
   sections  Section[]
 }
 

@@ -7,14 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
-
-interface JwtPayload {
-  sub: string;
-  email: string;
-  username: string;
-  iat?: number;
-  exp?: number;
-}
+import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -37,6 +30,7 @@ export class JwtAuthGuard implements CanActivate {
         id: decoded.sub,
         email: decoded.email,
         username: decoded.username,
+        role: decoded.role,
       };
       return true;
     } catch {

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { Request } from 'express';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
@@ -11,11 +12,17 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  private generateToken(user: { id: string; email: string; username: string }) {
+  private generateToken(user: {
+    id: string;
+    email: string;
+    username: string;
+    role: string;
+  }) {
     const payload = {
       sub: user.id,
       email: user.email,
       username: user.username,
+      role: user.role,
     };
 
     return {
@@ -44,7 +51,22 @@ export class AuthService {
     });
   }
 
-  async getUserSessions(userId: string) {
+  async getUserSessions(userId: string, userRole: Role) {
+    if (userRole === Role.ADMIN) {
+      return this.prisma.session.findMany({
+        select: {
+          id: true,
+          user: {
+            select: { id: true, username: true, email: true, role: true },
+          },
+          device: true,
+          ip: true,
+          createdAt: true,
+          expiresAt: true,
+        },
+      });
+    }
+
     return this.prisma.session.findMany({
       where: { userId },
       select: {
@@ -58,7 +80,7 @@ export class AuthService {
   }
 
   async validateUser(identifier: string, password: string) {
-    const user = await this.prisma.person.findFirst({
+    const user = await this.prisma.user.findFirst({
       where: {
         OR: [{ email: identifier }, { username: identifier }],
       },
@@ -98,7 +120,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    const user = await this.prisma.person.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
 
@@ -111,6 +133,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         username: user.username,
+        role: user.role,
       },
     );
 

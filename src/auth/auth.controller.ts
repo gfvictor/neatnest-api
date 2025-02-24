@@ -9,17 +9,10 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto, RefreshTokenDto } from './auth.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { LoginDto, RefreshTokenDto } from './auth.dto';
+import { AuthenticatedRequest } from '../common/interfaces/authenticated-request.interface';
 import { Request } from 'express';
-
-interface AuthenticatedRequest extends Request {
-  user: {
-    id: string;
-    email: string;
-    username: string;
-  };
-}
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +27,7 @@ export class AuthController {
   @Get('sessions')
   @UseGuards(JwtAuthGuard)
   async getUserSessions(@Req() req: AuthenticatedRequest) {
-    return this.authService.getUserSessions(req.user.id);
+    return this.authService.getUserSessions(req.user.id, req.user.role);
   }
 
   @Post('refresh')

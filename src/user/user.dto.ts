@@ -3,37 +3,44 @@ import {
   IsEmail,
   MinLength,
   IsBoolean,
+  IsEnum,
   IsOptional,
 } from 'class-validator';
 
-export class CreatePersonDto {
-  @IsString()
-  name: string;
-
-  @IsString()
-  username: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsString()
-  @MinLength(6, { message: 'The password must have at least 6 characters' })
-  password: string;
-
-  @IsBoolean()
-  @IsOptional()
-  homeUse?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  workUse?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  isAdmin?: boolean;
+export enum Role {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+  TESTER = 'TESTER',
 }
 
-export class UpdatePersonDto {
+export class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsString()
+  username: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(6, { message: 'The password must have at least 6 characters' })
+  password: string;
+
+  @IsBoolean()
+  @IsOptional()
+  homeUse?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  workUse?: boolean;
+
+  @IsEnum(Role)
+  @IsOptional()
+  role?: Role;
+}
+
+export class UpdateUserDto {
   @IsString()
   @IsOptional()
   name: string;
@@ -58,8 +65,4 @@ export class UpdatePersonDto {
   @IsBoolean()
   @IsOptional()
   workUse?: boolean;
-
-  @IsBoolean()
-  @IsOptional()
-  isAdmin?: boolean;
 }

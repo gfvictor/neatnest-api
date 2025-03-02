@@ -9,8 +9,9 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { LoginDto, RefreshTokenDto } from './auth.dto';
+import { JwtAuthGuard } from './guard/jwt-auth.guard';
+import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { AuthenticatedRequest } from '../common/interfaces/authenticated-request.interface';
 import { Request } from 'express';
 

@@ -13,11 +13,12 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticatedRequest } from '../common/interfaces/authenticated-request.interface';
-import { Roles } from '../auth/roles.decorator';
+import { Roles } from '../auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('user')
@@ -64,6 +65,12 @@ export class UserController {
     }
 
     return this.userService.updateRole(userId, body.role);
+  }
+
+  @Patch(':id/workplace')
+  @UseGuards(JwtAuthGuard)
+  async addWorkplace(@Param('id') userId: string) {
+    return this.userService.addWorkplace(userId);
   }
 
   @Delete(':id')

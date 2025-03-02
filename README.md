@@ -6,14 +6,45 @@
 <i>A well-structured API for managing household and workplace objects efficiently</i>
 </div>
 
+---
+
+## Index
+- [Overview](#overview)
+- [Technology Stack](#technology-stack)
+- [Installation Guide](#installation-guide)
+  - [Prerequisites](#prerequisites)
+  - [Clone the Repository](#clone-the-repository)
+  - [Install Dependencies](#install-dependencies)
+  - [Configure Environment Variables](#configure-environment-variables)
+- [Running the Application](#running-the-application)
+  - [Development Mode](#development-mode)
+  - [Database Synchronization](#database-synchronization)
+  - [Database Migration](#database-migration)
+  - [Database Modifications](#database-modifications)
+  - [Access Prisma Studio](#access-prisma-studio)
+  - [Production Mode](#production-mode)
+- [Database Schema](#database-schema)
+  - [User Table](#user-table-codeusercode)
+  - [Session Table](#session-table-codesessioncode)
+  - [Household Table](#household-table-codehouseholdcode)
+  - [Room Table](#room-table-coderoomcode)
+  - [Workplace Table](#workplace-table-codeworkplacecode)
+  - [Section Table](#section-table-codesectioncode)
+  - [Container Table](#container-table-codecontainercode)
+  - [Object Table](#object-table-codeobjectcode)
+- [License](#licence)
+
+
+---
+
 ## Overview
 
-<div>
-<b>NeatNest</b> is a scalable, RESTful API developed using <b>NestJS</b> and <b>Prisma</b>, designed to facilitate the efficient 
+**NeatNest** is a scalable, RESTful API developed using **NestJS** and **Prisma**, designed to facilitate the 
+efficient 
 management of household and workplace inventories. This system enables users to categorize and track objects within 
-designated rooms, sections, and containers. NeatNest incorporates role-based authentication and session management to 
+designated rooms, sections, and containers. **NeatNest** incorporates role-based authentication and session 
+management to 
 enhance security and accessibility.
-</div>
 
 ---
 
@@ -24,6 +55,10 @@ enhance security and accessibility.
 - **JWT Authentication** - Implements secure access through access and refresh tokens.
 - **Class-validator** - Enables robust DTO-based request validation.
 - **Swagger** - API documentation and interactive testing.
+
+
+**[Back to Index](#index)**
+
 ---
 
 ## Installation Guide
@@ -47,7 +82,7 @@ npm install
 
 ### Configure Environment Variables
 Create a <code>.env</code> file in the root directory and set the necessary configurations:
-```bash
+```dotenv
 DATABASE_URL=postgresql://user:password@host:port/dbname
 DIRECT_URL=provided-by-supabase
 SUPABASE_URL=provided-by-supabase
@@ -56,6 +91,9 @@ JWT_SECRET_KEY=your_jwt_secret
 PORT=3000
 TZ=your-timezone
 ```
+
+**[Back to Index](#index)**
+
 ---
 
 ## Running the Application
@@ -89,6 +127,9 @@ npm prisma studio
 npm run build
 npm run start
 ```
+
+**[Back to Index](#index)**
+
 ---
 
 ## Database Schema
@@ -118,11 +159,12 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 |--------------|----------|------------------------------------|
 | id           | UUID     | Primary key, Auto-generated        |
 | refreshToken | String   | Hashed token                       |
-| devide       | String   | User's device information          |
+| device       | String   | User's device information          |
 | ip           | String   | User's IP address                  |
 | createdAt    | DateTime | Auto-generated                     |
 | expiresAt    | DateTime | Expiration timestamp               |
 | userId       | UUID     | Foreign key (<code>User.id</code>) |
+
 
 ### Household Table (<code>Household</code>)
 | Column    | Type     | Constraints                 |
@@ -132,6 +174,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | updatedAt | DateTime | Auto-updated                |
 | deletedAt | DateTIme | Nullable                    |
 | userId    | UUID     | Foreign key (               |
+
 
 ### Room Table (<code>Room</code>)
 | Column      | Type     | Constraints                             |
@@ -143,6 +186,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | deleteAt    | DateTime | Nullable                                |
 | householdId | UUID     | Foreign key (<code>Household.id</code>) |
 
+
 ### Workplace Table (<code>Workplace</code>)
 | Column    | Type     | Constraints                 |
 |-----------|----------|-----------------------------|
@@ -150,6 +194,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | createdAt | DataTime | Auto-generated              |
 | updatedAt | DataTime | Auto-updated                |
 | deletedAt | DateTime | Nullable                    |
+
 
 ### Section Table (<code>Section</code>)
 | Column      | Type     | Constraints                             |
@@ -186,6 +231,9 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | updatedAt   | DateTime | Auto-updated                            |
 | deleteAt    | DateTime | Nullable                                |
 | containerId | UUID     | Foreign key (<code>Container.id</code>) |
+
+**[Back to Index](#index)**
+
 ---
 ## Licence
 

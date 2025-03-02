@@ -6,6 +6,37 @@
 <i>A well-structured API for managing household and workplace objects efficiently</i>
 </div>
 
+---
+
+## Index
+- [Overview](#overview)
+- [Technology Stack](#technology-stack)
+- [Installation Guide](#installation-guide)
+  - [Prerequisites](#prerequisites)
+  - [Clone the Repository](#clone-the-repository)
+  - [Install Dependencies](#install-dependencies)
+  - [Configure Environment Variables](#configure-environment-variables)
+- [Running the Application](#running-the-application)
+  - [Development Mode](#development-mode)
+  - [Database Synchronization](#database-synchronization)
+  - [Database Migration](#database-migration)
+  - [Database Modifications](#database-modifications)
+  - [Access Prisma Studio](#access-prisma-studio)
+  - [Production Mode](#production-mode)
+- [Database Schema](#database-schema)
+  - [User Table](#user-table-codeusercode)
+  - [Session Table](#session-table-codesessioncode)
+  - [Household Table](#household-table-codehouseholdcode)
+  - [Room Table](#room-table-coderoomcode)
+  - [Workplace Table](#workplace-table-codeworkplacecode)
+  - [Section Table](#section-table-codesectioncode)
+  - [Container Table](#container-table-codecontainercode)
+  - [Object Table](#object-table-codeobjectcode)
+- [License](#licence)
+
+
+---
+
 ## Overview
 
 <div>
@@ -47,7 +78,7 @@ npm install
 
 ### Configure Environment Variables
 Create a <code>.env</code> file in the root directory and set the necessary configurations:
-```bash
+```dotenv
 DATABASE_URL=postgresql://user:password@host:port/dbname
 DIRECT_URL=provided-by-supabase
 SUPABASE_URL=provided-by-supabase

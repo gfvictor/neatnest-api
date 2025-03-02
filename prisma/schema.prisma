@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  TESTER
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  username     String     @unique
+  email        String     @unique
+  password     String
+  avatar       String?
+  homeUse      Boolean    @default(true)
+  workUse      Boolean    @default(false)
+  role         Role       @default(USER)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+  householdId  String?
+  workplaceId  String?
+  refreshToken String?
+  household    Household? @relation(fields: [householdId], references: [id])
+  workplace    Workplace? @relation(fields: [workplaceId], references: [id])
+  sessions     Session[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshToken String
+  device       String
+  ip           String?
+  createdAt    DateTime @default(now())
+  expiresAt    DateTime
+}
+
+model Household {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  users     User[]
+  rooms     Room[]
+}
+
+model Room {
+  id          String      @id @default(uuid())
+  name        String
+  householdId String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+  containers  Container[]
+  household   Household   @relation(fields: [householdId], references: [id])
+}
+
+model Workplace {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  users     User[]
+  sections  Section[]
+}
+
+model Section {
+  id          String      @id @default(uuid())
+  name        String
+  workplaceId String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+  containers  Container[]
+  workplace   Workplace   @relation(fields: [workplaceId], references: [id])
+}
+
+model Container {
+  id        String    @id @default(uuid())
+  name      String
+  number    Int
+  image     String?
+  roomId    String?
+  sectionId String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  room      Room?     @relation(fields: [roomId], references: [id])
+  section   Section?  @relation(fields: [sectionId], references: [id])
+  objects   Object[]
+}
+
+model Object {
+  id          String    @id @default(uuid())
+  name        String
+  quantity    Int
+  category    String?
+  image       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+  containerId String
+  container   Container @relation(fields: [containerId], references: [id])
+}

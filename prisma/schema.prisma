@@ -81,7 +81,7 @@ model Section {
   workplaceId String
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  deletedAt   DateTime
+  deletedAt   DateTime?
   containers  Container[]
   workplace   Workplace   @relation(fields: [workplaceId], references: [id])
 }

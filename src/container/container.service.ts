@@ -2,12 +2,12 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateContainerDto } from './dto/create-container.dto';
 import { UpdateContainerDto } from './dto/update-container.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { User } from '@prisma/client';
+import { validateContainerAccess } from '../common/utils/validate-container-access';
 
 @Injectable()
 export class ContainerService {
@@ -37,23 +37,7 @@ export class ContainerService {
   }
 
   async findOneById(user: User, containerId: string) {
-    const container = await this.prisma.container.findUnique({
-      where: { id: containerId },
-      include: { room: true, section: true },
-    });
-
-    if (!container) throw new NotFoundException('Container not found');
-
-    const belongsToUser =
-      (container.room?.householdId &&
-        container.room.householdId === user.householdId) ||
-      (container.section?.workplaceId &&
-        container.section.workplaceId === user.workplaceId);
-
-    if (!belongsToUser)
-      throw new ForbiddenException('You do not have access to this container');
-
-    return container;
+    await validateContainerAccess(this.prisma, user, containerId);
   }
 
   async create(user: User, data: CreateContainerDto) {

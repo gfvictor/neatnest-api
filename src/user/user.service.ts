@@ -1,7 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
-import { CreateUserDto, UpdateUserDto } from './user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from '@prisma/client';
 
 @Injectable()
@@ -16,12 +21,39 @@ export class UserService {
 
   async create(data: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
+    const household = await this.prisma.household.create({
+      data: {},
+    });
+
+    const workplace = data.workUse
+      ? await this.prisma.workplace.create({ data: {} })
+      : null;
+
     return this.prisma.user.create({
       data: {
         ...data,
         password: hashedPassword,
         role: data.role ?? Role.USER,
+        householdId: household.id,
+        workplaceId: workplace?.id ?? null,
       },
+    });
+  }
+
+  async addWorkplace(userId: string) {
+    const user = await this.findUserOrThrow(userId);
+
+    if (user.workplaceId) {
+      throw new BadRequestException('User already has workplace');
+    }
+
+    const workplace = await this.prisma.workplace.create({
+      data: {},
+    });
+
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { workplaceId: workplace.id },
     });
   }
 

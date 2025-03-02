@@ -1,5 +1,5 @@
 import { User } from '@prisma/client';
 
-export interface RoomRequest extends Request {
+export interface UserRequest extends Request {
   user: User;
 }

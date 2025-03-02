@@ -18,7 +18,8 @@ export class RoomService {
   }
 
   async findOneById(user: User, roomId: string) {
-    if (!user.householdId) throw new NotFoundException('Household not found for this user');
+    if (!user.householdId)
+      throw new NotFoundException('Household not found for this user');
 
     const room = await this.prisma.room.findUnique({
       where: { id: roomId, householdId: user.householdId },
@@ -30,7 +31,8 @@ export class RoomService {
   }
 
   async create(user: User, data: CreateRoomDto) {
-    if (!user.householdId) throw new NotFoundException('Household not found for this user');
+    if (!user.householdId)
+      throw new NotFoundException('Household not found for this user');
 
     return this.prisma.room.create({
       data: {
@@ -53,6 +55,6 @@ export class RoomService {
     await this.findOneById(user, roomId);
     await this.prisma.room.delete({ where: { id: roomId } });
 
-    return { messgae: 'Room successfully deleted' };
+    return { message: 'Room successfully deleted' };
   }
 }

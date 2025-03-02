@@ -7,6 +7,7 @@ import { RoomModule } from './room/room.module';
 import { WorkplaceModule } from './workplace/workplace.module';
 import { SectionModule } from './section/section.module';
 import { ContainerModule } from './container/container.module';
+import { ObjectModule } from './object/object.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ContainerModule } from './container/container.module';
     WorkplaceModule,
     SectionModule,
     ContainerModule,
+    ObjectModule,
   ],
   controllers: [],
   providers: [],

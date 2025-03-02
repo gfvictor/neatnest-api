@@ -7,7 +7,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { Request } from 'express';
-import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
+import { JwtPayload } from '../../common/interfaces/jwt-payload.interface';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {

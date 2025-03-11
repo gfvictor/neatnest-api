@@ -8,6 +8,7 @@ import { WorkplaceModule } from './workplace/workplace.module';
 import { SectionModule } from './section/section.module';
 import { ContainerModule } from './container/container.module';
 import { ObjectModule } from './object/object.module';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ObjectModule } from './object/object.module';
     SectionModule,
     ContainerModule,
     ObjectModule,
+    StorageModule,
   ],
   controllers: [],
   providers: [],

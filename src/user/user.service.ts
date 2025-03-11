@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -11,7 +12,10 @@ import { Role } from '@prisma/client';
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   private async findUserOrThrow(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
@@ -83,6 +87,27 @@ export class UserService {
       where: { id: userId },
       data: { role },
     });
+  }
+
+  async uploadUserAvatar(userId: string, fileBuffer: Buffer, mimetype: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const fileName = `user-${userId}.webp`;
+    const avatarUrl = await this.storageService.uploadFile(
+      fileBuffer,
+      fileName,
+      'avatars',
+      mimetype,
+    );
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatar: avatarUrl },
+    });
+
+    return { message: 'Avatar updated successfully', avatarUrl };
   }
 
   async delete(id: string) {

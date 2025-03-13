@@ -2,12 +2,16 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { UpdateObjectDto } from './dto/update-object.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 import { User } from '@prisma/client';
 import { validateContainerAccess } from '../common/utils/validate-container-access';
 
 @Injectable()
 export class ObjectService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   async findByContainer(user: User, containerId: string) {
     await validateContainerAccess(this.prisma, user, containerId);
@@ -41,6 +45,28 @@ export class ObjectService {
         image: data.image,
         containerId: data.containerId,
       },
+    });
+  }
+
+  async uploadObjectImage(
+    user: User,
+    objectId: string,
+    fileBuffer: Buffer,
+    mimetype: string,
+  ) {
+    await this.findOneById(user, objectId);
+
+    const filePath = `object/${objectId}-${Date.now()}.webp`;
+    const imageUrl = await this.storageService.uploadFile(
+      fileBuffer,
+      filePath,
+      'objects',
+      mimetype,
+    );
+
+    return this.prisma.object.update({
+      where: { id: objectId },
+      data: { image: imageUrl },
     });
   }
 

@@ -8,12 +8,17 @@ import {
   Param,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { ObjectService } from './object.service';
 import { CreateObjectDto } from './dto/create-object.dto';
 import { UpdateObjectDto } from './dto/update-object.dto';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { UserRequest } from '../common/interfaces/user-request';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Express } from 'express';
 
 @Controller('object')
 @UseGuards(JwtAuthGuard)
@@ -45,6 +50,24 @@ export class ObjectController {
     @Body() data: UpdateObjectDto,
   ) {
     return this.objectService.update(req.user, objectId, data);
+  }
+
+  @Patch(':id/image')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadObjectImage(
+    @Req() req: UserRequest,
+    @Param('id') objectId: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file || !file.buffer || !file.mimetype)
+      throw new BadRequestException('Invalid file provided');
+
+    return this.objectService.uploadObjectImage(
+      req.user,
+      objectId,
+      file.buffer,
+      file.mimetype,
+    );
   }
 
   @Delete(':id')

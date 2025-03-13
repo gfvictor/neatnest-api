@@ -6,12 +6,16 @@ import {
 import { CreateContainerDto } from './dto/create-container.dto';
 import { UpdateContainerDto } from './dto/update-container.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { StorageService } from '../storage/storage.service';
 import { validateContainerAccess } from '../common/utils/validate-container-access';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ContainerService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   async findByLocation(user: User) {
     if (!user.householdId && !user.workplaceId)
@@ -59,6 +63,28 @@ export class ContainerService {
         roomId: data.roomId ?? null,
         sectionId: data.sectionId ?? null,
       },
+    });
+  }
+
+  async uploadContainerImage(
+    user: User,
+    containerId: string,
+    fileBuffer: Buffer,
+    mimetype: string,
+  ) {
+    await this.findOneById(user, containerId);
+
+    const filePath = `containers/${containerId}-${Date.now()}.webp`;
+    const imageUrl = await this.storageService.uploadFile(
+      fileBuffer,
+      filePath,
+      'containers',
+      mimetype,
+    );
+
+    return this.prisma.container.update({
+      where: { id: containerId },
+      data: { image: imageUrl },
     });
   }
 

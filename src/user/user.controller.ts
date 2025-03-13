@@ -11,13 +11,18 @@ import {
   UsePipes,
   ValidationPipe,
   ForbiddenException,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticatedRequest } from '../common/interfaces/authenticated-request.interface';
+import { Express } from 'express';
 import { Roles } from '../auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 
@@ -51,6 +56,23 @@ export class UserController {
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async update(@Param('id') id: string, @Body() data: UpdateUserDto) {
     return this.userService.update(id, data);
+  }
+
+  @Patch('avatar')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadUserAvatar(
+    @Req() req: AuthenticatedRequest,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file || !file.buffer || !file.mimetype) {
+      throw new BadRequestException('Invalid file provided');
+    }
+
+    return this.userService.uploadUserAvatar(
+      req.user.id,
+      file.buffer,
+      file.mimetype,
+    );
   }
 
   @Patch(':id/role')

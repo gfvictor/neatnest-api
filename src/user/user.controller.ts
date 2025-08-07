@@ -30,6 +30,12 @@ import { Role } from '@prisma/client';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @Get('current')
+  @UseGuards(JwtAuthGuard)
+  async getCurrentUser(@Req() req: AuthenticatedRequest) {
+    return this.userService.findOne(req.user.id);
+  }
+
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Body() data: CreateUserDto) {

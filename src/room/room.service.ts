@@ -8,21 +8,31 @@ import { User } from '@prisma/client';
 export class RoomService {
   constructor(private prisma: PrismaService) {}
 
-  async findByHousehold(user: User) {
+  private async getHouseholdOrThrow(userId: string): Promise<string> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { householdId: true },
+    });
+    if (!user) throw new NotFoundException('User not found');
     if (!user.householdId)
       throw new NotFoundException('Household not found for this user');
+    return user.householdId;
+  }
+
+  async findByHousehold(user: User) {
+    const householdId = await this.getHouseholdOrThrow(user.id);
 
     return this.prisma.room.findMany({
-      where: { householdId: user.householdId },
+      where: { householdId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async findOneById(user: User, roomId: string) {
-    if (!user.householdId)
-      throw new NotFoundException('Household not found for this user');
+    const householdId = await this.getHouseholdOrThrow(user.id);
 
-    const room = await this.prisma.room.findUnique({
-      where: { id: roomId, householdId: user.householdId },
+    const room = await this.prisma.room.findFirst({
+      where: { id: roomId, householdId },
     });
 
     if (!room) throw new NotFoundException('Room not found in this household');
@@ -31,13 +41,12 @@ export class RoomService {
   }
 
   async create(user: User, data: CreateRoomDto) {
-    if (!user.householdId)
-      throw new NotFoundException('Household not found for this user');
+    const householdId = await this.getHouseholdOrThrow(user.id);
 
     return this.prisma.room.create({
       data: {
         name: data.name,
-        householdId: user.householdId,
+        householdId,
       },
     });
   }

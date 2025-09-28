@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 import { validateContainerAccess } from '../common/utils/validate-container-access';
 import { User } from '@prisma/client';
+import { ListContainersDto } from './dto/list-containers.dto';
 
 @Injectable()
 export class ContainerService {
@@ -17,27 +18,33 @@ export class ContainerService {
     private storageService: StorageService,
   ) {}
 
-  async findByLocation(user: User) {
-    if (!user.householdId && !user.workplaceId)
+  async findWithFilters(user: User, { roomId, sectionId }: ListContainersDto) {
+    if (!user.householdId && !user.workplaceId) {
       throw new ForbiddenException(
         'User does not belong to a household or workplace',
       );
+    }
 
-    const filters: {
+    if (roomId || sectionId) {
+      return this.prisma.container.findMany({
+        where: {
+          ...(roomId ? { roomId } : {}),
+          ...(sectionId ? { sectionId } : {}),
+        },
+        orderBy: { createdAt: 'desc' },
+      });
+    }
+
+    const whereOr: {
       room?: { householdId: string };
       section?: { workplaceId: string };
     }[] = [];
+    if (user.householdId)
+      whereOr.push({ room: { householdId: user.householdId } });
+    if (user.workplaceId)
+      whereOr.push({ section: { workplaceId: user.workplaceId } });
 
-    if (user.householdId) {
-      filters.push({ room: { householdId: user.householdId } });
-    }
-    if (user.workplaceId) {
-      filters.push({ section: { workplaceId: user.workplaceId } });
-    }
-
-    return this.prisma.container.findMany({
-      where: { OR: filters },
-    });
+    return this.prisma.container.findMany({ where: { OR: whereOr } });
   }
 
   async findOneById(user: User, containerId: string) {

@@ -11,6 +11,9 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  UsePipes,
+  ValidationPipe,
+  Query,
 } from '@nestjs/common';
 import { ContainerService } from './container.service';
 import { CreateContainerDto } from './dto/create-container.dto';
@@ -19,6 +22,7 @@ import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { UserRequest } from '../common/interfaces/user-request';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
+import { ListContainersDto } from './dto/list-containers.dto';
 
 @Controller('container')
 @UseGuards(JwtAuthGuard)
@@ -26,8 +30,15 @@ export class ContainerController {
   constructor(private readonly containerService: ContainerService) {}
 
   @Get()
-  async getContainers(@Req() req: UserRequest) {
-    return this.containerService.findByLocation(req.user);
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async getContainers(
+    @Req() req: UserRequest,
+    @Query() query: ListContainersDto,
+  ) {
+    if (query.roomId && query.sectionId) {
+      throw new BadRequestException('Use roomId OR sectionId, not both.');
+    }
+    return this.containerService.findWithFilters(req.user, query);
   }
 
   @Get(':id')

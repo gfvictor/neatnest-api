@@ -52,10 +52,44 @@ export class ContainerService {
   }
 
   async create(user: User, data: CreateContainerDto) {
-    if (!user.householdId && !user.workplaceId)
-      throw new ForbiddenException(
-        'User must belong to a household or workplace',
-      );
+    if (data.roomId) {
+      const room = await this.prisma.room.findUnique({
+        where: { id: data.roomId },
+        select: { householdId: true },
+      });
+
+      if (!room) {
+        throw new BadRequestException('Room not found');
+      }
+
+      const userRecord = await this.prisma.user.findUnique({
+        where: { id: user.id },
+        select: { householdId: true },
+      });
+
+      if (room.householdId !== userRecord?.householdId)
+        throw new ForbiddenException('User does not belong to this household');
+    }
+
+    if (data.sectionId) {
+      const section = await this.prisma.section.findUnique({
+        where: { id: data.sectionId },
+        select: { workplaceId: true },
+      });
+
+      if (!section) {
+        throw new BadRequestException('Section not found');
+      }
+
+      const userRecord = await this.prisma.user.findUnique({
+        where: { id: user.id },
+        select: { workplaceId: true },
+      });
+
+      if (section.workplaceId !== userRecord?.workplaceId) {
+        throw new ForbiddenException('User does not belong to this workplace');
+      }
+    }
 
     if (data.roomId && data.sectionId)
       throw new BadRequestException(

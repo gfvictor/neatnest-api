@@ -17,12 +17,16 @@ export class AuthService {
     email: string;
     username: string;
     role: string;
+    householdId?: string | null;
+    workplaceId?: string | null;
   }) {
     const payload = {
       sub: user.id,
       email: user.email,
       username: user.username,
       role: user.role,
+      householdId: user.householdId,
+      workplaceId: user.workplaceId,
     };
 
     return {
@@ -134,6 +138,8 @@ export class AuthService {
         email: user.email,
         username: user.username,
         role: user.role,
+        householdId: user.householdId,
+        workplaceId: user.workplaceId,
       },
     );
 

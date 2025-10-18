@@ -3,6 +3,8 @@ export interface JwtPayload {
   email: string;
   username: string;
   role: string;
+  householdId: string;
+  workplaceId?: string | null;
   iat?: number;
   exp?: number;
 }

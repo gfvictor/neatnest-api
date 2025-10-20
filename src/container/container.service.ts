@@ -49,6 +49,15 @@ export class ContainerService {
 
   async findOneById(user: User, containerId: string) {
     await validateContainerAccess(this.prisma, user, containerId);
+
+    return this.prisma.container.findUnique({
+      where: { id: containerId },
+      include: {
+        objects: true,
+        room: { select: { name: true } },
+        section: { select: { name: true } },
+      },
+    });
   }
 
   async create(user: User, data: CreateContainerDto) {

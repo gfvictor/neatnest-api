@@ -18,6 +18,7 @@ export class ObjectService {
 
     return this.prisma.object.findMany({
       where: { containerId },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

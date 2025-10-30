@@ -6,6 +6,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'https://neatnest.vercel.app',
+      'https://myneatnest.netlify.app',
       'http://localhost:4200',
       'http://192.168.1.99:4200',
     ],

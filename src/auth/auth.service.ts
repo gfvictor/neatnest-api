@@ -155,6 +155,10 @@ export class AuthService {
   }
 
   async logout(sessionId: string) {
+    if (!sessionId || sessionId.trim() === '') {
+      throw new UnauthorizedException('Session ID is required');
+    }
+
     const session = await this.prisma.session.findUnique({
       where: { id: sessionId },
     });

@@ -5,7 +5,8 @@ export class CreateContainerDto {
   name: string;
 
   @IsInt()
-  number: number;
+  @IsOptional()
+  number?: number;
 
   @IsString()
   @IsOptional()

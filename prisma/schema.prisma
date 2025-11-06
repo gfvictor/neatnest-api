@@ -89,7 +89,7 @@ model Section {
 model Container {
   id        String    @id @default(uuid())
   name      String
-  number    Int
+  number    Int?
   image     String?
   roomId    String?
   sectionId String?

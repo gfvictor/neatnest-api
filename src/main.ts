@@ -9,7 +9,7 @@ async function bootstrap() {
       'https://neatnest.vercel.app',
       'https://myneatnest.netlify.app',
       'http://localhost:4200',
-      'http://192.168.1.99:4200',
+      'http://192.168.1.111:4200',
     ],
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

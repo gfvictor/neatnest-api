@@ -65,8 +65,8 @@ export class ContainerService {
 
     return {
       ...container,
-      roomId: container.room?.id || null,
-      sectionId: container.section?.id || null,
+      roomId: container.roomId ?? container.room?.id ?? null,
+      sectionId: container.sectionId ?? container.section?.id ?? null,
     };
   }
 

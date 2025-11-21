@@ -1,11 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
-import { Readable } from 'stream';
 
 @Injectable()
 export class StorageService {
-  private supabase: SupabaseClient;
+  private supabase: SupabaseClient<any, any, 'public', any, any>;
 
   constructor(private readonly configService: ConfigService) {
     this.supabase = createClient(
@@ -32,7 +31,7 @@ export class StorageService {
 
     const { error } = await this.supabase.storage
       .from(this.configService.get<string>('SUPABASE_BUCKET') ?? '')
-      .upload(filePath, Readable.from(fileBuffer), { contentType: mimeType });
+      .upload(filePath, fileBuffer, { contentType: mimeType });
 
     if (error) {
       throw new BadRequestException(`Upload failed: ${error.message}`);

@@ -22,16 +22,32 @@ export class StorageService {
     fileName: string,
     folder: string,
     mimeType: string,
+    userId: string,
+    userRole: string,
   ): Promise<string> {
-    if (!fileBuffer || !fileName || !folder || !mimeType) {
+    if (
+      !fileBuffer ||
+      !fileName ||
+      !folder ||
+      !mimeType ||
+      !userId ||
+      !userRole
+    ) {
       throw new BadRequestException('Invalid file data');
+    }
+
+    if (!['USER', 'ADMIN'].includes(userRole)) {
+      throw new BadRequestException('User role not allowed to upload');
     }
 
     const filePath = `${folder}/${Date.now()}-${fileName}`;
 
     const { error } = await this.supabase.storage
       .from(this.configService.get<string>('SUPABASE_BUCKET') ?? '')
-      .upload(filePath, fileBuffer, { contentType: mimeType });
+      .upload(filePath, fileBuffer, {
+        contentType: mimeType,
+        metadata: { owner: userId, role: userRole },
+      });
 
     if (error) {
       throw new BadRequestException(`Upload failed: ${error.message}`);

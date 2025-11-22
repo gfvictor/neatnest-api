@@ -131,6 +131,8 @@ export class ContainerService {
     containerId: string,
     fileBuffer: Buffer,
     mimetype: string,
+    userId: string,
+    userRole: string,
   ) {
     await this.findOneById(user, containerId);
 
@@ -140,6 +142,8 @@ export class ContainerService {
       filePath,
       'containers',
       mimetype,
+      userId,
+      userRole,
     );
 
     return this.prisma.container.update({

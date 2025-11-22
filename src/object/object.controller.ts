@@ -67,6 +67,8 @@ export class ObjectController {
       objectId,
       file.buffer,
       file.mimetype,
+      req.user.id,
+      req.user.role,
     );
   }
 

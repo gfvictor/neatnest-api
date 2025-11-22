@@ -72,6 +72,8 @@ export class ContainerController {
       containerId,
       file.buffer,
       file.mimetype,
+      req.user.id,
+      req.user.role,
     );
   }
 

@@ -89,7 +89,12 @@ export class UserService {
     });
   }
 
-  async uploadUserAvatar(userId: string, fileBuffer: Buffer, mimetype: string) {
+  async uploadUserAvatar(
+    userId: string,
+    userRole: string,
+    fileBuffer: Buffer,
+    mimetype: string,
+  ) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
 
     if (!user) throw new NotFoundException('User not found');
@@ -100,6 +105,8 @@ export class UserService {
       fileName,
       'avatars',
       mimetype,
+      userId,
+      userRole,
     );
 
     await this.prisma.user.update({

@@ -54,6 +54,8 @@ export class ObjectService {
     objectId: string,
     fileBuffer: Buffer,
     mimetype: string,
+    userId: string,
+    userRole: string,
   ) {
     await this.findOneById(user, objectId);
 
@@ -63,6 +65,8 @@ export class ObjectService {
       filePath,
       'objects',
       mimetype,
+      userId,
+      userRole,
     );
 
     return this.prisma.object.update({

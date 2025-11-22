@@ -76,6 +76,7 @@ export class UserController {
 
     return this.userService.uploadUserAvatar(
       req.user.id,
+      req.user.role,
       file.buffer,
       file.mimetype,
     );

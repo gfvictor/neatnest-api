@@ -15,35 +15,21 @@ enum Role {
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String     @id
   name         String
   username     String     @unique
   email        String     @unique
-  password     String
   avatar       String?
   homeUse      Boolean    @default(true)
-  workUse      Boolean    @default(false)
+  workUse      Boolean    @default(true)
   role         Role       @default(USER)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   deletedAt    DateTime?
   householdId  String?
   workplaceId  String?
-  refreshToken String?
   household    Household? @relation(fields: [householdId], references: [id], onDelete: Cascade)
   workplace    Workplace? @relation(fields: [workplaceId], references: [id], onDelete: Cascade)
-  sessions     Session[]
-}
-
-model Session {
-  id           String   @id @default(uuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshToken String
-  device       String
-  ip           String?
-  createdAt    DateTime @default(now())
-  expiresAt    DateTime
 }
 
 model Household {

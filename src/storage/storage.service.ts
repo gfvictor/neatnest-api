@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
+import * as sharp from 'sharp';
 
 @Injectable()
 export class StorageService {
@@ -40,12 +41,32 @@ export class StorageService {
       throw new BadRequestException('User role not allowed to upload');
     }
 
-    const filePath = `${folder}/${Date.now()}-${fileName}`;
+    let processedBuffer = fileBuffer;
+    let finalMimeType = mimeType;
+    let finalFileName = fileName;
+
+    if (mimeType.startsWith('image/')) {
+      try {
+        processedBuffer = await sharp(fileBuffer)
+          .resize({ width: 1080, withoutEnlargement: true })
+          .webp({ quality: 80 })
+          .toBuffer();
+
+        finalMimeType = 'image/webp';
+        const nameWithoutExt =
+          fileName.substring(0, fileName.lastIndexOf('.')) || fileName;
+        finalFileName = `${nameWithoutExt}.webp`;
+      } catch (err) {
+        throw new BadRequestException(`Image processing failed: ${err}`);
+      }
+    }
+
+    const filePath = `${folder}/${Date.now()}-${finalFileName}`;
 
     const { error } = await this.supabase.storage
       .from(this.configService.get<string>('SUPABASE_BUCKET') ?? '')
-      .upload(filePath, fileBuffer, {
-        contentType: mimeType,
+      .upload(filePath, processedBuffer, {
+        contentType: finalMimeType,
         metadata: { owner: userId, role: userRole },
       });
 

@@ -1,7 +1,6 @@
 import {
   IsString,
   IsEmail,
-  MinLength,
   IsBoolean,
   IsEnum,
   IsOptional,
@@ -15,6 +14,9 @@ export enum Role {
 
 export class CreateUserDto {
   @IsString()
+  id: string;
+
+  @IsString()
   name: string;
 
   @IsString()
@@ -22,10 +24,6 @@ export class CreateUserDto {
 
   @IsEmail()
   email: string;
-
-  @IsString()
-  @MinLength(6, { message: 'The password must have at least 6 characters' })
-  password: string;
 
   @IsBoolean()
   @IsOptional()

@@ -1,16 +1,17 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import type { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
   app.enableCors({
     origin: [
-      'https://neatnest.vercel.app',
-      'https://myneatnest.netlify.app',
-      'http://localhost:4200',
-      'http://192.168.1.111:4200',
-    ],
+      configService.get<string>('DESKTOP_TESTING_ORIGIN') ?? '',
+      configService.get<string>('MOBILE_TESTING_ORIGIN') ?? '',
+    ].filter((url) => url !== ''),
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

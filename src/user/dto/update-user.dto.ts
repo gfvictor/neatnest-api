@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsEmail,
-  MinLength,
-  IsBoolean,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsEmail, IsBoolean, IsOptional } from 'class-validator';
 
 export class UpdateUserDto {
   @IsString()
@@ -18,11 +12,6 @@ export class UpdateUserDto {
   @IsEmail()
   @IsOptional()
   email: string;
-
-  @IsString()
-  @MinLength(6, { message: 'The password must have at least 6 characters' })
-  @IsOptional()
-  password: string;
 
   @IsBoolean()
   @IsOptional()

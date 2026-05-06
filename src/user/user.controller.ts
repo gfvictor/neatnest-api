@@ -18,6 +18,7 @@ import {
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
+import { SignupGuard } from '../auth/guard/signup.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -36,12 +37,6 @@ export class UserController {
     return this.userService.findOne(req.user.id);
   }
 
-  @Post()
-  @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body() data: CreateUserDto) {
-    return this.userService.create(data);
-  }
-
   @Get()
   @Roles('ADMIN')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -54,6 +49,13 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   async findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
+  }
+
+  @Post()
+  @UseGuards(SignupGuard)
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async create(@Body() data: CreateUserDto) {
+    return this.userService.create(data);
   }
 
   @Patch(':id')
@@ -94,12 +96,6 @@ export class UserController {
     }
 
     return this.userService.updateRole(userId, body.role);
-  }
-
-  @Patch(':id/workplace')
-  @UseGuards(JwtAuthGuard)
-  async addWorkplace(@Param('id') userId: string) {
-    return this.userService.addWorkplace(userId);
   }
 
   @Delete(':id')

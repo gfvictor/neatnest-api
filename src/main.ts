@@ -1,16 +1,27 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import type { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  const desktopOrigins = (
+    configService.get<string>('DESKTOP_TESTING_ORIGIN') ?? ''
+  )
+    .split(',')
+    .filter((url) => url.trim() !== '');
+  const mobileOrigins = (
+    configService.get<string>('MOBILE_TESTING_ORIGIN') ?? ''
+  )
+    .split(',')
+    .filter((url) => url.trim() !== '');
+
+  const allowedOrigins = [...desktopOrigins, ...mobileOrigins];
+
   app.enableCors({
-    origin: [
-      'https://neatnest.vercel.app',
-      'https://myneatnest.netlify.app',
-      'http://localhost:4200',
-      'http://192.168.1.111:4200',
-    ],
+    origin: allowedOrigins,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

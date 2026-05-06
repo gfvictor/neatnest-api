@@ -4,9 +4,10 @@ import { UserController } from './user.controller';
 import { AuthModule } from '../auth/auth.module';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
 import { StorageModule } from '../storage/storage.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [AuthModule, StorageModule],
+  imports: [AuthModule, StorageModule, ConfigModule],
   providers: [UserService, JwtAuthGuard],
   controllers: [UserController],
   exports: [UserService],

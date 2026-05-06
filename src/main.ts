@@ -7,11 +7,21 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  const desktopOrigins = (
+    configService.get<string>('DESKTOP_TESTING_ORIGIN') ?? ''
+  )
+    .split(',')
+    .filter((url) => url.trim() !== '');
+  const mobileOrigins = (
+    configService.get<string>('MOBILE_TESTING_ORIGIN') ?? ''
+  )
+    .split(',')
+    .filter((url) => url.trim() !== '');
+
+  const allowedOrigins = [...desktopOrigins, ...mobileOrigins];
+
   app.enableCors({
-    origin: [
-      configService.get<string>('DESKTOP_TESTING_ORIGIN') ?? '',
-      configService.get<string>('MOBILE_TESTING_ORIGIN') ?? '',
-    ].filter((url) => url !== ''),
+    origin: allowedOrigins,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

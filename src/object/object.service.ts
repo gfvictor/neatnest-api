@@ -80,6 +80,10 @@ export class ObjectService {
   async update(user: User, objectId: string, data: UpdateObjectDto) {
     const object = await this.findOneById(user, objectId);
 
+    if (data.image === null && object.image) {
+      await this.storageService.deleteFileByUrl(object.image);
+    }
+
     return this.prisma.object.update({
       where: { id: object.id },
       data,

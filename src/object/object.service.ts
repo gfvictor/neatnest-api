@@ -57,7 +57,9 @@ export class ObjectService {
     userId: string,
     userRole: string,
   ) {
-    await this.findOneById(user, objectId);
+    const object = await this.findOneById(user, objectId);
+
+    await this.storageService.deleteFileByUrl(object.image);
 
     const filePath = `object/${objectId}-${Date.now()}.webp`;
     const imageUrl = await this.storageService.uploadFile(
@@ -88,6 +90,8 @@ export class ObjectService {
     const object = await this.findOneById(user, objectId);
 
     await this.prisma.object.delete({ where: { id: object.id } });
+
+    await this.storageService.deleteFileByUrl(object.image);
 
     return { message: 'Object successfully deleted' };
   }

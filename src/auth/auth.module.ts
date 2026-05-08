@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { SupabaseAuthStrategy } from './supabase-auth.strategy';
+import { SupabaseSignupStrategy } from './supabase-signup.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -10,8 +11,8 @@ import { PrismaModule } from '../prisma/prisma.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     PrismaModule,
   ],
-  providers: [SupabaseAuthStrategy],
+  providers: [SupabaseAuthStrategy, SupabaseSignupStrategy],
   controllers: [],
-  exports: [PassportModule, SupabaseAuthStrategy],
+  exports: [PassportModule, SupabaseAuthStrategy, SupabaseSignupStrategy],
 })
 export class AuthModule {}

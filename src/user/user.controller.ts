@@ -17,13 +17,14 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
+import { JwtSignupGuard } from '../auth/guard/jwt-signup.guard';
 import { RolesGuard } from '../auth/guard/roles.guard';
 import { SignupGuard } from '../auth/guard/signup.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthenticatedRequest } from '../common/interfaces/authenticated-request.interface';
-import { Express } from 'express';
+import { Express, Request } from 'express';
 import { Roles } from '../auth/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 
@@ -52,10 +53,13 @@ export class UserController {
   }
 
   @Post()
-  @UseGuards(SignupGuard)
+  @UseGuards(SignupGuard, JwtSignupGuard)
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  async create(@Body() data: CreateUserDto) {
-    return this.userService.create(data);
+  async create(
+    @Req() req: Request & { user: { sub: string; email: string } },
+    @Body() data: CreateUserDto,
+  ) {
+    return this.userService.create(req.user.sub, req.user.email, data);
   }
 
   @Patch(':id')

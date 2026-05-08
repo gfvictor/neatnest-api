@@ -18,13 +18,15 @@ export class UserService {
     return user;
   }
 
-  async create(data: CreateUserDto) {
+  async create(id: string, email: string, data: CreateUserDto) {
     const household = await this.prisma.household.create({ data: {} });
     const workplace = await this.prisma.workplace.create({ data: {} });
 
     return this.prisma.user.create({
       data: {
         ...data,
+        id,
+        email,
         role: data.role ?? Role.USER,
         householdId: household.id,
         workplaceId: workplace.id,

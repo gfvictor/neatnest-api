@@ -21,13 +21,34 @@ export class SupabaseAuthStrategy extends PassportStrategy(Strategy, 'jwt') {
     sub: string;
     email: string;
     app_metadata: { role: 'USER' | 'ADMIN' | 'TESTER' };
+    user_metadata?: { name?: string };
   }) {
-    const user = await this.prisma.user.findUnique({
+    let user = await this.prisma.user.findUnique({
       where: { id: payload.sub },
     });
 
     if (!user) {
-      throw new UnauthorizedException('User not found in local database.');
+      const fullName =
+        payload.user_metadata?.name || payload.email.split('@')[0];
+      const firstName = fullName.split(' ')[0];
+      const household = await this.prisma.household.create({ data: {} });
+      const workplace = await this.prisma.workplace.create({ data: {} });
+
+      try {
+        user = await this.prisma.user.create({
+          data: {
+            id: payload.sub,
+            email: payload.email,
+            name: firstName,
+            role: payload.app_metadata?.role || 'USER',
+            householdId: household.id,
+            workplaceId: workplace.id,
+          },
+        });
+      } catch (err) {
+        console.error('Failed to auto-provision user: ', err);
+        throw new UnauthorizedException('Error creating user profile.');
+      }
     }
 
     return user;

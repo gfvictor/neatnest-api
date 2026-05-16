@@ -10,9 +10,6 @@ export class CreateUserDto {
   @IsString()
   name: string;
 
-  @IsString()
-  username: string;
-
   @IsBoolean()
   @IsOptional()
   homeUse?: boolean;

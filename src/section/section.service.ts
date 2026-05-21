@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateSectionDto } from './dto/create-section.dto';
-import { UpdateSectionDto } from './dto/update-section.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateSectionDto } from "./dto/create-section.dto";
+import { UpdateSectionDto } from "./dto/update-section.dto";
+import { PrismaService } from "../prisma/prisma.service";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class SectionService {
@@ -10,7 +10,7 @@ export class SectionService {
 
   async findByWorkplace(user: User) {
     if (!user.workplaceId)
-      throw new NotFoundException('Workplace not found for this user');
+      throw new NotFoundException("Workplace not found for this user");
 
     return this.prisma.section.findMany({
       where: { workplaceId: user.workplaceId },
@@ -19,21 +19,32 @@ export class SectionService {
 
   async findOneById(user: User, sectionId: string) {
     if (!user.workplaceId)
-      throw new NotFoundException('Workplace not found for this user');
+      throw new NotFoundException("Workplace not found for this user");
 
     const section = await this.prisma.section.findUnique({
       where: { id: sectionId, workplaceId: user.workplaceId },
     });
 
     if (!section)
-      throw new NotFoundException('Section not found in this workplace');
+      throw new NotFoundException("Section not found in this workplace");
 
     return section;
   }
 
+  async searchForGlobal(searchTerm: string, workplaceId: string) {
+    return this.prisma.section.findMany({
+      where: {
+        name: { contains: searchTerm, mode: "insensitive" },
+        workplaceId,
+        deletedAt: null,
+      },
+      take: 20,
+    })
+  }
+
   async create(user: User, data: CreateSectionDto) {
     if (!user.workplaceId)
-      throw new NotFoundException('Workplace not found for this user');
+      throw new NotFoundException("Workplace not found for this user");
 
     return this.prisma.section.create({
       data: {
@@ -56,6 +67,6 @@ export class SectionService {
     await this.findOneById(user, sectionId);
     await this.prisma.section.delete({ where: { id: sectionId } });
 
-    return { message: 'Section successfully deleted' };
+    return { message: "Section successfully deleted" };
   }
 }

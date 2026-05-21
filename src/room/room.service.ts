@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateRoomDto } from "@neatnest/room/dto/create-room.dto";
+import { UpdateRoomDto } from "@neatnest/room/dto/update-room.dto";
+import { PrismaService } from "@neatnest/prisma/prisma.service";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class RoomService {
@@ -13,9 +13,9 @@ export class RoomService {
       where: { id: userId },
       select: { householdId: true },
     });
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException("User not found");
     if (!user.householdId)
-      throw new NotFoundException('Household not found for this user');
+      throw new NotFoundException("Household not found for this user");
     return user.householdId;
   }
 
@@ -24,7 +24,7 @@ export class RoomService {
 
     return this.prisma.room.findMany({
       where: { householdId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -35,9 +35,20 @@ export class RoomService {
       where: { id: roomId, householdId },
     });
 
-    if (!room) throw new NotFoundException('Room not found in this household');
+    if (!room) throw new NotFoundException("Room not found in this household");
 
     return room;
+  }
+
+  async searchForGlobal(searchTerm: string, householdId: string) {
+    return this.prisma.room.findMany({
+      where: {
+        name: { contains: searchTerm, mode: "insensitive" },
+        householdId,
+        deletedAt: null,
+      },
+      take: 20,
+    });
   }
 
   async create(user: User, data: CreateRoomDto) {
@@ -64,6 +75,6 @@ export class RoomService {
     await this.findOneById(user, roomId);
     await this.prisma.room.delete({ where: { id: roomId } });
 
-    return { message: 'Room successfully deleted' };
+    return { message: "Room successfully deleted" };
   }
 }

@@ -10,6 +10,7 @@ import { ContainerModule } from './container/container.module';
 import { ObjectModule } from './object/object.module';
 import { StorageModule } from './storage/storage.module';
 import { ConfigModule } from '@nestjs/config';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ConfigModule } from '@nestjs/config';
     ContainerModule,
     ObjectModule,
     StorageModule,
+    SearchModule,
   ],
   controllers: [],
   providers: [],

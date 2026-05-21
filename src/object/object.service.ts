@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateObjectDto } from './dto/create-object.dto';
-import { UpdateObjectDto } from './dto/update-object.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
-import { User } from '@prisma/client';
-import { validateContainerAccess } from '../common/utils/validate-container-access';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { CreateObjectDto } from "@neatnest/object/dto/create-object.dto";
+import { UpdateObjectDto } from "@neatnest/object/dto/update-object.dto";
+import { PrismaService } from "@neatnest/prisma/prisma.service";
+import { StorageService } from "@neatnest/storage/storage.service";
+import { User, Prisma } from "@prisma/client";
+import { validateContainerAccess } from "@neatnest/common/utils/validate-container-access";
 
 @Injectable()
 export class ObjectService {
@@ -18,7 +18,7 @@ export class ObjectService {
 
     return this.prisma.object.findMany({
       where: { containerId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -28,11 +28,46 @@ export class ObjectService {
       include: { container: { include: { room: true, section: true } } },
     });
 
-    if (!object) throw new NotFoundException('Object not found');
+    if (!object) throw new NotFoundException("Object not found");
 
     await validateContainerAccess(this.prisma, user, object.containerId);
 
     return object;
+  }
+
+  async searchForGlobal(
+    searchTerm: string,
+    accessConditions: Prisma.ContainerWhereInput[],
+  ) {
+    if (!accessConditions || accessConditions.length === 0) {
+      return [];
+    }
+
+    return this.prisma.object.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: "insensitive" } },
+          { category: { contains: searchTerm, mode: "insensitive" } },
+        ],
+        container: {
+          OR: accessConditions,
+        },
+        deletedAt: null,
+      },
+      include: {
+        container: {
+          select: {
+            id: true,
+            name: true,
+            roomId: true,
+            sectionId: true,
+            room: { select: { id: true, name: true } },
+            section: { select: { id: true, name: true } },
+          },
+        },
+      },
+      take: 20,
+    });
   }
 
   async create(user: User, data: CreateObjectDto) {
@@ -65,7 +100,7 @@ export class ObjectService {
     const imageUrl = await this.storageService.uploadFile(
       fileBuffer,
       filePath,
-      'objects',
+      "objects",
       mimetype,
       userId,
       userRole,
@@ -97,6 +132,6 @@ export class ObjectService {
 
     await this.storageService.deleteFileByUrl(object.image);
 
-    return { message: 'Object successfully deleted' };
+    return { message: "Object successfully deleted" };
   }
 }

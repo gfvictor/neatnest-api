@@ -14,17 +14,17 @@ import {
   UsePipes,
   ValidationPipe,
   Query,
-} from '@nestjs/common';
-import { ContainerService } from './container.service';
-import { CreateContainerDto } from './dto/create-container.dto';
-import { UpdateContainerDto } from './dto/update-container.dto';
-import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
-import { UserRequest } from '../common/interfaces/user-request';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
-import { ListContainersDto } from './dto/list-containers.dto';
+} from "@nestjs/common";
+import { ContainerService } from "./container.service";
+import { CreateContainerDto } from "./dto/create-container.dto";
+import { UpdateContainerDto } from "./dto/update-container.dto";
+import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
+import { UserRequest } from "../common/interfaces/user-request";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
+import { ListContainersDto } from "./dto/list-containers.dto";
 
-@Controller('container')
+@Controller("container")
 @UseGuards(JwtAuthGuard)
 export class ContainerController {
   constructor(private readonly containerService: ContainerService) {}
@@ -36,15 +36,15 @@ export class ContainerController {
     @Query() query: ListContainersDto,
   ) {
     if (query.roomId && query.sectionId) {
-      throw new BadRequestException('Use roomId OR sectionId, not both.');
+      throw new BadRequestException("Use roomId OR sectionId, not both.");
     }
     return this.containerService.findWithFilters(req.user, query);
   }
 
-  @Get(':id')
+  @Get(":id")
   async getContainerById(
     @Req() req: UserRequest,
-    @Param('id') containerId: string,
+    @Param("id") containerId: string,
   ) {
     return this.containerService.findOneById(req.user, containerId);
   }
@@ -57,15 +57,15 @@ export class ContainerController {
     return this.containerService.create(req.user, data);
   }
 
-  @Patch(':id/image')
-  @UseInterceptors(FileInterceptor('file'))
+  @Patch(":id/image")
+  @UseInterceptors(FileInterceptor("file"))
   async uploadContainerImage(
     @Req() req: UserRequest,
-    @Param('id') containerId: string,
+    @Param("id") containerId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file || !file.buffer || !file.mimetype)
-      throw new BadRequestException('Invalid file provided');
+      throw new BadRequestException("Invalid file provided");
 
     return this.containerService.uploadContainerImage(
       req.user,
@@ -77,17 +77,17 @@ export class ContainerController {
     );
   }
 
-  @Patch(':id')
+  @Patch(":id")
   async updateContainer(
     @Req() req: UserRequest,
-    @Param('id') containerId: string,
+    @Param("id") containerId: string,
     @Body() data: UpdateContainerDto,
   ) {
     return this.containerService.update(req.user, containerId, data);
   }
 
-  @Delete(':id')
-  async remove(@Req() req: UserRequest, @Param('id') containerId: string) {
+  @Delete(":id")
+  async remove(@Req() req: UserRequest, @Param("id") containerId: string) {
     return this.containerService.remove(req.user, containerId);
   }
 }

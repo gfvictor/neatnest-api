@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsInt, IsOptional } from "class-validator";
 
 export class CreateContainerDto {
   @IsString()

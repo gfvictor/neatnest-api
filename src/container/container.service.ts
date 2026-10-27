@@ -2,14 +2,14 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-} from '@nestjs/common';
-import { CreateContainerDto } from './dto/create-container.dto';
-import { UpdateContainerDto } from './dto/update-container.dto';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
-import { validateContainerAccess } from '../common/utils/validate-container-access';
-import { User } from '@prisma/client';
-import { ListContainersDto } from './dto/list-containers.dto';
+} from "@nestjs/common";
+import { CreateContainerDto } from "./dto/create-container.dto";
+import { UpdateContainerDto } from "./dto/update-container.dto";
+import { PrismaService } from "../prisma/prisma.service";
+import { StorageService } from "../storage/storage.service";
+import { validateContainerAccess } from "../common/utils/validate-container-access";
+import { User, Prisma } from "@prisma/client";
+import { ListContainersDto } from "./dto/list-containers.dto";
 
 @Injectable()
 export class ContainerService {
@@ -21,7 +21,7 @@ export class ContainerService {
   async findWithFilters(user: User, { roomId, sectionId }: ListContainersDto) {
     if (!user.householdId && !user.workplaceId) {
       throw new ForbiddenException(
-        'User does not belong to a household or workplace',
+        "User does not belong to a household or workplace",
       );
     }
 
@@ -31,7 +31,7 @@ export class ContainerService {
           ...(roomId ? { roomId } : {}),
           ...(sectionId ? { sectionId } : {}),
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
     }
 
@@ -60,7 +60,7 @@ export class ContainerService {
     });
 
     if (!container) {
-      throw new BadRequestException('Container not found');
+      throw new BadRequestException("Container not found");
     }
 
     return {
@@ -68,6 +68,39 @@ export class ContainerService {
       roomId: container.roomId ?? container.room?.id ?? null,
       sectionId: container.sectionId ?? container.section?.id ?? null,
     };
+  }
+
+  async searchForGlobal(
+    searchTerm: string,
+    isNumeric: boolean,
+    searchNumber: number | undefined,
+    accessConditions: Prisma.ContainerWhereInput[],
+  ) {
+    if (!accessConditions || accessConditions.length === 0) {
+      return [];
+    }
+
+    return this.prisma.container.findMany({
+      where: {
+        AND: [
+          {
+            OR: [
+              { name: { contains: searchTerm, mode: "insensitive" } },
+              ...(isNumeric ? [{ number: searchNumber }] : []),
+            ],
+          },
+          {
+            OR: accessConditions,
+          },
+        ],
+        deletedAt: null,
+      },
+      include: {
+        room: { select: { id: true, name: true } },
+        section: { select: { id: true, name: true } },
+      },
+      take: 20,
+    });
   }
 
   async create(user: User, data: CreateContainerDto) {
@@ -78,7 +111,7 @@ export class ContainerService {
       });
 
       if (!room) {
-        throw new BadRequestException('Room not found');
+        throw new BadRequestException("Room not found");
       }
 
       const userRecord = await this.prisma.user.findUnique({
@@ -87,7 +120,7 @@ export class ContainerService {
       });
 
       if (room.householdId !== userRecord?.householdId)
-        throw new ForbiddenException('User does not belong to this household');
+        throw new ForbiddenException("User does not belong to this household");
     }
 
     if (data.sectionId) {
@@ -97,7 +130,7 @@ export class ContainerService {
       });
 
       if (!section) {
-        throw new BadRequestException('Section not found');
+        throw new BadRequestException("Section not found");
       }
 
       const userRecord = await this.prisma.user.findUnique({
@@ -106,13 +139,13 @@ export class ContainerService {
       });
 
       if (section.workplaceId !== userRecord?.workplaceId) {
-        throw new ForbiddenException('User does not belong to this workplace');
+        throw new ForbiddenException("User does not belong to this workplace");
       }
     }
 
     if (data.roomId && data.sectionId)
       throw new BadRequestException(
-        'A container cannot belong to both a room and a section at the same time',
+        "A container cannot belong to both a room and a section at the same time",
       );
 
     return this.prisma.container.create({
@@ -140,7 +173,7 @@ export class ContainerService {
     const imageUrl = await this.storageService.uploadFile(
       fileBuffer,
       filePath,
-      'containers',
+      "containers",
       mimetype,
       userId,
       userRole,
@@ -165,6 +198,6 @@ export class ContainerService {
     await this.findOneById(user, containerId);
     await this.prisma.container.delete({ where: { id: containerId } });
 
-    return { message: 'Container successfully deleted' };
+    return { message: "Container successfully deleted" };
   }
 }

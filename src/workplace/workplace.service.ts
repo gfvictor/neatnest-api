@@ -2,9 +2,9 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { UpdateWorkplaceDto } from './dto/update-workplace.dto';
-import { PrismaService } from '../prisma/prisma.service';
+} from "@nestjs/common";
+import { UpdateWorkplaceDto } from "./dto/update-workplace.dto";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class WorkplaceService {
@@ -17,7 +17,7 @@ export class WorkplaceService {
     });
 
     if (user?.workplaceId)
-      throw new BadRequestException('User already has a workplace');
+      throw new BadRequestException("User already has a workplace");
 
     const workplace = await this.prisma.workplace.create({ data: {} });
 
@@ -37,7 +37,7 @@ export class WorkplaceService {
     });
 
     if (!user?.workplaceId)
-      throw new NotFoundException('Workplace not found for this user');
+      throw new NotFoundException("Workplace not found for this user");
 
     return this.prisma.workplace.findUnique({
       where: { id: user.workplaceId },
@@ -58,6 +58,6 @@ export class WorkplaceService {
 
     await this.prisma.workplace.delete({ where: { id: workplace?.id } });
 
-    return { message: 'Workplace successfully deleted' };
+    return { message: "Workplace successfully deleted" };
   }
 }

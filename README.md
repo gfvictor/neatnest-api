@@ -25,7 +25,6 @@
   - [Production Mode](#production-mode)
 - [Database Schema](#database-schema)
   - [User Table](#user-table-codeusercode)
-  - [Session Table](#session-table-codesessioncode)
   - [Household Table](#household-table-codehouseholdcode)
   - [Room Table](#room-table-coderoomcode)
   - [Workplace Table](#workplace-table-codeworkplacecode)
@@ -52,7 +51,7 @@ enhance security and accessibility.
 - **NestJS** - Node.js framework for building efficient and scalable server-side applications.
 - **Prisma ORM** - Modern database toolkit to streamline interactions with PostgreSQL.
 - **PostgreSQL** - Relational database solution hosted via Supabase.
-- **JWT Authentication** - Implements secure access through access and refresh tokens.
+- **Supabase Auth** - Handles authentication and JWT issuance; a signup strategy provisions the local `User` profile on first sign-in.
 - **Class-validator** - Enables robust DTO-based request validation.
 - **Swagger** - API documentation and interactive testing.
 
@@ -136,34 +135,20 @@ npm run start
 The database follows a relational structure using **PostgreSQL**,  managed via **Prisma ORM**.
 
 ### User Table (<code>User</code>)
-| Column       | Type     | Constraints                                       |
-|--------------|----------|---------------------------------------------------|
-| id           | UUID     | Primary key, Auto-generated                       |
-| name         | String   | Not null                                          |
-| username     | String   | Unique, Not null                                  |
-| email        | String   | Unique, Not null                                  |
-| password     | String   | Not null                                          |
-| homeUse      | Boolean  | Default: true                                     |
-| workUse      | Boolean  | Default: false                                    |
-| role         | Enum     | [user, admin, tester] <br/>Default: user          |
-| createtAt    | DateTime | Auto-generated                                    |
-| updatedAt    | DateTime | Auto-updated                                      |
-| deletedAt    | DateTime | Nullable                                          |
-| refreshToken | String   | Nullable                                          |
-| householdId  | UUID     | Nullable, Foreign key (<code>Household.id</code>) |
-| workplaceId  | UUID     | Nullable, Foreign key (<code>Workplace.id</code>) |
-
-
-### Session Table (<code>Session</code>)
-| Column       | Type     | Constraints                        |
-|--------------|----------|------------------------------------|
-| id           | UUID     | Primary key, Auto-generated        |
-| refreshToken | String   | Hashed token                       |
-| device       | String   | User's device information          |
-| ip           | String   | User's IP address                  |
-| createdAt    | DateTime | Auto-generated                     |
-| expiresAt    | DateTime | Expiration timestamp               |
-| userId       | UUID     | Foreign key (<code>User.id</code>) |
+| Column      | Type     | Constraints                                        |
+|-------------|----------|-----------------------------------------------------|
+| id          | String   | Primary key (Supabase Auth user id)                |
+| name        | String   | Not null                                           |
+| email       | String   | Unique, Not null                                   |
+| avatar      | String   | Nullable                                           |
+| homeUse     | Boolean  | Default: true                                      |
+| workUse     | Boolean  | Default: true                                      |
+| role        | Enum     | [USER, ADMIN, TESTER] <br/>Default: USER           |
+| createdAt   | DateTime | Auto-generated                                     |
+| updatedAt   | DateTime | Auto-updated                                       |
+| deletedAt   | DateTime | Nullable                                           |
+| householdId | String   | Nullable, Foreign key (<code>Household.id</code>)  |
+| workplaceId | String   | Nullable, Foreign key (<code>Workplace.id</code>)  |
 
 
 ### Household Table (<code>Household</code>)
@@ -172,8 +157,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | id        | UUID     | Primary key, Auto-generated |
 | createdAt | DateTime | Auto-generated              |
 | updatedAt | DateTime | Auto-updated                |
-| deletedAt | DateTIme | Nullable                    |
-| userId    | UUID     | Foreign key (               |
+| deletedAt | DateTime | Nullable                    |
 
 
 ### Room Table (<code>Room</code>)
@@ -181,9 +165,9 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 |-------------|----------|-----------------------------------------|
 | id          | UUID     | Primary key, Auto-generated             |
 | name        | String   | Not null                                |
-| createdAt   | DataTime | Auto-generated                          |
+| createdAt   | DateTime | Auto-generated                          |
 | updatedAt   | DateTime | Auto-updated                            |
-| deleteAt    | DateTime | Nullable                                |
+| deletedAt   | DateTime | Nullable                                |
 | householdId | UUID     | Foreign key (<code>Household.id</code>) |
 
 
@@ -191,8 +175,8 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | Column    | Type     | Constraints                 |
 |-----------|----------|-----------------------------|
 | id        | UUID     | Primary key, Auto-generated |
-| createdAt | DataTime | Auto-generated              |
-| updatedAt | DataTime | Auto-updated                |
+| createdAt | DateTime | Auto-generated              |
+| updatedAt | DateTime | Auto-updated                |
 | deletedAt | DateTime | Nullable                    |
 
 
@@ -211,7 +195,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 |-----------|----------|-------------------------------------------------------|
 | id        | UUID     | Primary key, Auto-generated                           |
 | name      | String   | Not null                                              |
-| number    | Int      | Not null                                              |
+| number    | Int      | Nullable                                              |
 | image     | String   | Nullable                                              |
 | createdAt | DateTime | Auto-generated                                        |
 | updatedAt | DateTime | Auto-updated                                          |
@@ -229,7 +213,7 @@ The database follows a relational structure using **PostgreSQL**,  managed via *
 | image       | String   | Nullable                                |
 | createdAt   | DateTime | Auto-generated                          |
 | updatedAt   | DateTime | Auto-updated                            |
-| deleteAt    | DateTime | Nullable                                |
+| deletedAt   | DateTime | Nullable                                |
 | containerId | UUID     | Foreign key (<code>Container.id</code>) |
 
 **[Back to Index](#index)**

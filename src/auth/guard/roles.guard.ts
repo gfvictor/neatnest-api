@@ -3,11 +3,11 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { User } from '@prisma/client';
-import { Request } from 'express';
-import { Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Reflector } from "@nestjs/core";
+import { User } from "@prisma/client";
+import { Request } from "express";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -17,7 +17,7 @@ export class RolesGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const requiredRoles = this.reflector.get<string[]>(
-      'roles',
+      "roles",
       context.getHandler(),
     );
     if (!requiredRoles) {
@@ -29,7 +29,7 @@ export class RolesGuard implements CanActivate {
 
     if (!user || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException(
-        'You do not have permissions to access this resource.',
+        "You do not have permissions to access this resource.",
       );
     }
 

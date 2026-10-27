@@ -39,7 +39,7 @@ export class SectionService {
         deletedAt: null,
       },
       take: 20,
-    })
+    });
   }
 
   async create(user: User, data: CreateSectionDto) {

@@ -12,7 +12,7 @@ export class SearchController {
   async search(
     @Req() req: UserRequest,
     @Query("q") query: string,
-    @Query('scope') scope?: 'household' | 'workplace',
+    @Query("scope") scope?: "household" | "workplace",
   ) {
     return this.searchService.globalSearch(req.user, query, scope);
   }

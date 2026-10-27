@@ -11,30 +11,30 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-} from '@nestjs/common';
-import { ObjectService } from './object.service';
-import { CreateObjectDto } from './dto/create-object.dto';
-import { UpdateObjectDto } from './dto/update-object.dto';
-import { JwtAuthGuard } from '../auth/guard/jwt-auth.guard';
-import { UserRequest } from '../common/interfaces/user-request';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
+} from "@nestjs/common";
+import { ObjectService } from "./object.service";
+import { CreateObjectDto } from "./dto/create-object.dto";
+import { UpdateObjectDto } from "./dto/update-object.dto";
+import { JwtAuthGuard } from "../auth/guard/jwt-auth.guard";
+import { UserRequest } from "../common/interfaces/user-request";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { Express } from "express";
 
-@Controller('object')
+@Controller("object")
 @UseGuards(JwtAuthGuard)
 export class ObjectController {
   constructor(private readonly objectService: ObjectService) {}
 
-  @Get('container/:containerId')
+  @Get("container/:containerId")
   async getObjectsByContainer(
     @Req() req: UserRequest,
-    @Param('containerId') containerId: string,
+    @Param("containerId") containerId: string,
   ) {
     return this.objectService.findByContainer(req.user, containerId);
   }
 
-  @Get(':id')
-  async getObjectById(@Req() req: UserRequest, @Param('id') objectId: string) {
+  @Get(":id")
+  async getObjectById(@Req() req: UserRequest, @Param("id") objectId: string) {
     return this.objectService.findOneById(req.user, objectId);
   }
 
@@ -43,24 +43,24 @@ export class ObjectController {
     return this.objectService.create(req.user, data);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   async updateObject(
     @Req() req: UserRequest,
-    @Param('id') objectId: string,
+    @Param("id") objectId: string,
     @Body() data: UpdateObjectDto,
   ) {
     return this.objectService.update(req.user, objectId, data);
   }
 
-  @Patch(':id/image')
-  @UseInterceptors(FileInterceptor('file'))
+  @Patch(":id/image")
+  @UseInterceptors(FileInterceptor("file"))
   async uploadObjectImage(
     @Req() req: UserRequest,
-    @Param('id') objectId: string,
+    @Param("id") objectId: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file || !file.buffer || !file.mimetype)
-      throw new BadRequestException('Invalid file provided');
+      throw new BadRequestException("Invalid file provided");
 
     return this.objectService.uploadObjectImage(
       req.user,
@@ -72,8 +72,8 @@ export class ObjectController {
     );
   }
 
-  @Delete(':id')
-  async removeObject(@Req() req: UserRequest, @Param('id') objectId: string) {
+  @Delete(":id")
+  async removeObject(@Req() req: UserRequest, @Param("id") objectId: string) {
     return this.objectService.remove(req.user, objectId);
   }
 }

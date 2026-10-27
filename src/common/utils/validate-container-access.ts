@@ -1,6 +1,6 @@
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '@prisma/client';
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { User } from "@prisma/client";
 
 export async function validateContainerAccess(
   prisma: PrismaService,
@@ -12,7 +12,7 @@ export async function validateContainerAccess(
     include: { room: true, section: true },
   });
 
-  if (!container) throw new NotFoundException('Container not found');
+  if (!container) throw new NotFoundException("Container not found");
 
   const belongToUser =
     (container.room?.householdId &&
@@ -21,7 +21,7 @@ export async function validateContainerAccess(
       container.section.workplaceId === user.workplaceId);
 
   if (!belongToUser)
-    throw new ForbiddenException('You do not have access to this container');
+    throw new ForbiddenException("You do not have access to this container");
 
   return container;
 }

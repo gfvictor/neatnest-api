@@ -1,9 +1,9 @@
-import { IsString, IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsEnum, IsOptional } from "class-validator";
 
 export enum Role {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  TESTER = 'TESTER',
+  USER = "USER",
+  ADMIN = "ADMIN",
+  TESTER = "TESTER",
 }
 
 export class CreateUserDto {

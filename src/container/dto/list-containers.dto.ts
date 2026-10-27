@@ -1,4 +1,4 @@
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsOptional, IsUUID } from "class-validator";
 
 export class ListContainersDto {
   @IsOptional()
@@ -6,6 +6,6 @@ export class ListContainersDto {
   roomId?: string;
 
   @IsOptional()
-  @IsUUID('4')
+  @IsUUID("4")
   sectionId?: string;
 }

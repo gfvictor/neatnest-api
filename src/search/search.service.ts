@@ -29,12 +29,14 @@ export class SearchService {
 
     const accessConditions: Prisma.ContainerWhereInput[] = [];
 
-    const shouldSearchHousehold = user.householdId && (!scope || scope === 'household');
+    const shouldSearchHousehold =
+      user.householdId && (!scope || scope === "household");
     if (shouldSearchHousehold && user.householdId) {
       accessConditions.push({ room: { householdId: user.householdId } });
     }
 
-    const shouldSearchWorkplace = user.workplaceId && (!scope || scope === 'workplace');
+    const shouldSearchWorkplace =
+      user.workplaceId && (!scope || scope === "workplace");
     if (shouldSearchWorkplace && user.workplaceId) {
       accessConditions.push({ section: { workplaceId: user.workplaceId } });
     }
@@ -49,7 +51,7 @@ export class SearchService {
         searchTerm,
         isNumeric,
         searchNumber,
-        accessConditions
+        accessConditions,
       ),
 
       shouldSearchHousehold
